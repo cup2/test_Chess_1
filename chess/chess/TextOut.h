@@ -25,4 +25,6 @@ private:
 	std::string stringBadMoveCheck = "Invalid move, you have check";
 	std::string stringCheck = "Check";
 	std::string stringCheckMate = "CheckMate";
+	std::string stringPat= "Draw";
+
 };

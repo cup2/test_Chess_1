@@ -20,14 +20,16 @@ void TextOut::drawMessage(int code, sf::RenderWindow& window) {
 		update(window, stringBadMoveFigure);
 		break;
 	case 4:
-		update(window, stringCheck);
+		update(window, stringCheckMate);
 		break;
 	case 5:
-		update(window, stringCheckMate);
+		update(window, stringPat);
+		break;
+	case 6:
+		update(window, stringCheck);
 		break;
 	default:
 		update(window, stringWhire);
-
 		break;
 	}
 }
