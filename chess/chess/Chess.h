@@ -17,6 +17,16 @@ enum TYPE_FIGURE {
 	PAWN = 6//14 , 22
 };
 
+enum STATUS_CODE {
+	OK = 1,
+	CHECK_CURENT,
+	CHECK_ENEMY,//11 , 19
+	CHANGE_PAWN,//12, 20
+	DOCASTLING, // 13, 21
+	CHECKMATE,
+	PAT
+};
+
 enum COLOR_CHESS {
 	WHITE = 8,
 	BLACK = 16
@@ -31,9 +41,16 @@ class Chess
 {
 public:
 	Chess() {};
-
-
-
+	int getTypeCatling() {
+		return typeCastling;
+	}
+	bool getIsWhaiteNewFigure() {
+		return waitNewPawn;
+	}
+	bool getIsCheck() {
+		return isCheck;
+	}
+	int changePawn(int typefigure, const sf::Vector2f& pos);
 	int checkMove(const sf::Vector2f& oldPos,const sf::Vector2f& newPos, bool isWhite);
 	int mathboard[8][8] =
 	{
@@ -49,19 +66,31 @@ public:
 	};
 	void drawMatrix();
 private:
+	std::vector<Vec> moveBishopQuin = { {1,1}, {1,-1},{-1,-1},{-1,1} };
+	std::vector<Vec> moveRookQuin = { {0,1}, {0,-1},{1,0},{-1,0} };
+	std::vector<Vec> moveKnight = { {1,2}, {1,-2},{-1,2},{-1,-2},{2,1},{2,-1},{-2,1},{-2,-1}};
+	int typeCastling = 0;
+
+	bool isCheck = false;
 	bool isBeRokB = false;
 	bool isBeRokW = false;
+	bool waitNewPawn = false;
 	const int maskTypeFigure = KING | QUIN | PAWN | ROOK | KNIGHT | BISHOP;
 	const int maskColorFigure = WHITE | BLACK;
 
-	int checkCheckMate(const int& color);
+
+	bool checkPawnIsAttack(const sf::Vector2f& coordKing, const int& color);
+	int checkAvalebleMove(const COLOR_CHESS& color);
+	int checkCheckMate(const COLOR_CHESS& color);
 	bool checkKnightIsAttack(const sf::Vector2f& coordKing, const int& color);
 	int checkCheck(const int& color,  sf::Vector2f coordKing = { -1,-1 });
-	bool checkIsAtackKing(const int& kingColor, const Vec& attack, const Vec& needAtack, const sf::Vector2f& coord);
+	int checkIsAtackKing(const int& kingColor, const Vec& attack, const Vec& needAtack, const sf::Vector2f& coord);
 	int doCastling(const int& type, const COLOR_CHESS&); // 0 short // 1 long
 	int setNewPosition(const sf::Vector2f& oldPos, const sf::Vector2f& newPos, const int& color, const int& type);
+
 	int checkIsAvalable(const sf::Vector2f& newCoord, const int& color);
 	int checkIsFigureAfter(const sf::Vector2f& oldCoord, const Vec& move);
+	int haveMove( Vec move, const sf::Vector2f& coord, const int color,const bool reapeted);
 	int checkKing(const sf::Vector2f& oldCoord, const sf::Vector2f& newCoord, const int& color);
 	int checkQuin(const sf::Vector2f& oldCoord, const sf::Vector2f& newCoord, const int& color);
 	int checkBishop(const sf::Vector2f& oldCoord, const sf::Vector2f& newCoord, const int& color);
