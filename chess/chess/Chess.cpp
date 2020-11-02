@@ -7,6 +7,11 @@ int Chess::changePawn(int typefigure, const sf::Vector2f& pos) {
 	if (waitNewPawn) {
 		mathboard[(int)pos.y][(int)pos.x] = type | color;
 		waitNewPawn = false;
+		COLOR_CHESS aponentColor = (color==BLACK) ? WHITE : BLACK;
+		isCheck = checkCheck(aponentColor);
+		if (isCheck && checkCheckMate(aponentColor)) {
+			return CHECKMATE;
+		};
 		return 0;
 	}
 	return 1;
