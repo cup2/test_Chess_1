@@ -18,14 +18,12 @@ int Game::drawChangePawnFigureChoose(const int& selectedFigure) {
 	return 1;
 }
 
-
-
 int Game::makeMove(const sf::Vector2f& oldPos, sf::Vector2f& newPos, const int& selectedFigure) {
 	statusCode = 0;
-	int status = round.checkMove(toCoord8x8(oldPos), toCoord8x8(newPos), isWhiteMove);
+	int status = round->checkMove(toCoord8x8(oldPos), toCoord8x8(newPos), isWhiteMove);
 	if (status) {
 		if (status == DOCASTLING) {
-		   return drawCastling(round.getTypeCatling());
+		   return drawCastling(round->getTypeCatling());
 		}
 
 	   for (int i = 0; i < 32; i++) {
@@ -51,6 +49,7 @@ int Game::makeMove(const sf::Vector2f& oldPos, sf::Vector2f& newPos, const int& 
 		}
 	}
 	else if (status == PAT) {
+
 		statusCode = 5;
 		newPos = oldPos;
 	}
@@ -122,27 +121,29 @@ int Game::execute(){
 				if (sf::IntRect(150, 100, 300, 50).contains(sf::Mouse::getPosition(window))) {  menuNum = 1; }
 				if (sf::IntRect(150, 204, 300, 50).contains(sf::Mouse::getPosition(window))) {  menuNum = 3; }
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))                {
-					if (menuNum == 1) isMenu = false; 
+					if (menuNum == 1) {
+						isWhiteMove = true;
+						loadPosition();
+						delete round;
+						round = new Chess();
+						isRun = true;
+						statusCode = 0;
+						isMenu = false;
+					}
 					if (menuNum == 3) { window.close(); isMenu = false; }
 				}
 			}
-			if(!isMenu) {
-				/////drag and drop///////
-
+			if(!isMenu && isRun) {
 				if (e.type == sf::Event::MouseButtonPressed) {
-					if (round.getIsWhaiteNewFigure() &&  e.key.code == sf::Mouse::Left) {
-						std::cout << "Hear3";
+					if (round->getIsWhaiteNewFigure() &&  e.key.code == sf::Mouse::Left) {
 						for (int i = 0; i < 4; i++) chessFigureChoose[i].move(-28, -28.);
-
-
 						if (e.key.code == sf::Mouse::Left) {
 							for (int i = 0; i < 4; i++) {
-								std::cout << "\ntest2"<<pos.x<<" "<<pos.y<<"  \n";
 								if (chessFigureChoose[i].getGlobalBounds().contains(pos.x, pos.y)) {
-									std::cout << "\ntest2\n";
-									std::cout << "\ntest4" << chessFigureChoose[i].getPosition().x << " " << chessFigureChoose[i].getPosition().y << "  \n";
 									newPos = sf::Vector2f(size * int(pos.x / size), size * int(pos.y / size));
-									round.changePawn(i, toCoord8x8(newPos));
+									if (round->changePawn(i, toCoord8x8(newPos))==CHECKMATE) {
+										statusCode = 4;
+									}
 									for (int z = 0; z < 4; z++) {
 										chessFigureChoose[z].setPosition(-100, -100);
 									}
@@ -166,7 +167,7 @@ int Game::execute(){
 
 				if (e.type == sf::Event::MouseButtonPressed) {                          
 
-					if (!round.getIsWhaiteNewFigure() && e.key.code == sf::Mouse::Left) {
+					if (!round->getIsWhaiteNewFigure() && e.key.code == sf::Mouse::Left) {
 						for (int i = 0; i < 32; i++)
 							if (chessFigure[i].getGlobalBounds().contains(pos.x, pos.y))                            {
 								if ((isWhiteMove && i > 15) || (!isWhiteMove && i < 16)) {
@@ -180,10 +181,8 @@ int Game::execute(){
 					}
 				}
 				if (e.type == sf::Event::MouseButtonReleased) {
-
-
 					if (e.key.code == sf::Mouse::Left) {
-						if ((!round.getIsWhaiteNewFigure() && isWhiteMove && selectedFigure > 15) || (!isWhiteMove && selectedFigure < 16)) {
+						if ((!round->getIsWhaiteNewFigure() && isWhiteMove && selectedFigure > 15) || (!isWhiteMove && selectedFigure < 16)) {
 							isMove = false;
 							sf::Vector2f p = chessFigure[selectedFigure].getPosition() + sf::Vector2f(size / 2, size / 2);
 							newPos = sf::Vector2f(size * int(p.x / size), size * int(p.y / size));
@@ -202,25 +201,33 @@ int Game::execute(){
 
 				if (isMove) {
 					chessFigure[selectedFigure].setPosition(pos.x - dx, pos.y - dy);
-				}
-
-
-
-
+				}							   				 
 				window.clear();
 				window.draw(board);
+				for (int i = 0; i < 32;  i++) chessFigure[i].move(offset);
+				for (int i = 0; i < 32; i++) window.draw(chessFigure[i]);
+				window.draw(chessFigure[selectedFigure]);
+				if (round->getIsWhaiteNewFigure()) {
+					window.draw(chessFigureChoose[0]);
+					window.draw(chessFigureChoose[1]);
+					window.draw(chessFigureChoose[2]);
+					window.draw(chessFigureChoose[3]);
+				}
+				for (int i = 0; i < 32; i++) chessFigure[i].move(-offset);
+
 				if (statusCode == 4) {
 					alert.drawMessage(4, window);
+					isRun = false;
 				}
-				else if (round.getIsCheck()) {
+				else if (round->getIsCheck()) {
 					alert.drawMessage(6, window);
 				}
 				else if (statusCode == 3) {
 					alert.drawMessage(3, window);
 				}
-
 				else if (statusCode == 5) {
 					alert.drawMessage(5, window);
+					isRun = false;
 				}
 				else if (isWhiteMove) {
 					alert.drawMessage(1, window);
@@ -229,16 +236,7 @@ int Game::execute(){
 					alert.drawMessage(2, window);
 				}
 
-				for (int i = 0; i < 32;  i++) chessFigure[i].move(offset);
-				for (int i = 0; i < 32; i++) window.draw(chessFigure[i]);
-				window.draw(chessFigure[selectedFigure]);
-				if (round.getIsWhaiteNewFigure()) {
-					window.draw(chessFigureChoose[0]);
-					window.draw(chessFigureChoose[1]);
-					window.draw(chessFigureChoose[2]);
-					window.draw(chessFigureChoose[3]);
-				}
-				for (int i = 0; i < 32; i++) chessFigure[i].move(-offset);
+
 				window.display();
 			}
 		}
@@ -264,8 +262,6 @@ void Game::loadPosition(){
 	chessFigureChoose[1].setTextureRect(sf::IntRect(size * 1, size * 0, size, size));
 	chessFigureChoose[2].setTextureRect(sf::IntRect(size * 2, size * 0, size, size));
 	chessFigureChoose[3].setTextureRect(sf::IntRect(size * 3, size * 0, size, size));
-
-
 	chessFigureChoose[0].setColor(sf::Color::Green);
 	chessFigureChoose[1].setColor(sf::Color::Green);
 	chessFigureChoose[2].setColor(sf::Color::Green);
@@ -273,8 +269,6 @@ void Game::loadPosition(){
 	for (int z = 0; z < 4; z++) {
 		chessFigureChoose[z].setPosition(-100, -100);
 	}
-
-
 	for (int i = 0; i < 8; i++)
 		for (int j = 0; j < 8; j++){
 			int n = initBoard[i][j];
@@ -285,8 +279,6 @@ void Game::loadPosition(){
 			chessFigure[k].setPosition(size * j, size * i);
 			k++;
 		}
-
-
 }
 
 sf::Vector2f Game::toCoord8x8(sf::Vector2f pos) {

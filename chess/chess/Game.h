@@ -32,7 +32,7 @@ private:
 
 	bool isRun = true;
 	int statusCode = 0;
-	Chess round;
+	Chess *round = new Chess();
 	TextOut alert;
 	bool isWhiteMove = true;
 	const int initBoard[8][8] = {

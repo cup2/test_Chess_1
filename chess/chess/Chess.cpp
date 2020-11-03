@@ -14,9 +14,8 @@ int Chess::changePawn(int typefigure, const sf::Vector2f& pos) {
 		};
 		return 0;
 	}
-	return 1;
+	return 0;
 }
-
 bool Chess::checkPawnIsAttack(const sf::Vector2f& coordKing, const int& color){
 	int k = ((color == WHITE) ? -1 : 1);
 	int x = coordKing.x + k;
@@ -34,10 +33,7 @@ bool Chess::checkPawnIsAttack(const sf::Vector2f& coordKing, const int& color){
 
 
 int Chess::checkMove(const sf::Vector2f& oldPos, const sf::Vector2f& newPos, bool isWhite) {
-	COLOR_CHESS curentColor = (isWhite) ? WHITE : BLACK;
-	if (checkCheckMate(curentColor)) {
-		return PAT;
-	};
+	COLOR_CHESS curentColor = (isWhite) ? WHITE : BLACK;	
 	int type = (mathboard[(int)oldPos.y][(int)oldPos.x] & maskTypeFigure);
 	int result = 0;
 	switch (type) {
@@ -75,6 +71,9 @@ int Chess::checkMove(const sf::Vector2f& oldPos, const sf::Vector2f& newPos, boo
 	default:
 		break;
 	}
+	if (checkCheckMate(curentColor)) {
+		return PAT;
+	};
 	COLOR_CHESS aponentColor = (!isWhite) ? WHITE : BLACK; 
 	isCheck = checkCheck(aponentColor);
 	if (isCheck && checkCheckMate(aponentColor)) {
@@ -147,8 +146,8 @@ int Chess::checkAvalebleMove(const COLOR_CHESS& color) {
 				}				
 			}	
 
-			if ((((figuraType == ROOK) || (figuraType == QUIN)) && ((mathboard[(int)y][(int)x] & color) == color)) ) {
-				for (auto it = moveRookQuin.begin(); it < moveBishopQuin.end(); ++it) {
+			if (((figuraType == ROOK) || (figuraType == QUIN)) && ((mathboard[(int)y][(int)x] & color) == color)) {
+				for (auto it = moveRookQuin.begin(); it < moveRookQuin.end(); ++it) {
 					if (haveMove(*it, { x, y }, color, true)){
 						return 1;
 					}
@@ -211,7 +210,6 @@ int Chess::checkCheckMate(const COLOR_CHESS& color) {
 	return 1;
 }
 
-
 int Chess::setNewPosition(const sf::Vector2f& oldPos, const sf::Vector2f& newPos,const int& color, const int& type) {
 	mathboard[(int)oldPos.y][(int)oldPos.x] = 0;
 	mathboard[(int)newPos.y][(int)newPos.x] = type | color;
@@ -248,7 +246,6 @@ int Chess::checkIsAtackKing(const int& kingColor, const  Vec& attack, const Vec&
 
 int Chess::checkCheck(const int& color, sf::Vector2f coordKing) {
 	int isCheck = false;
-
 	if (coordKing.x == -1) {
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -286,8 +283,7 @@ int Chess::checkCheck(const int& color, sf::Vector2f coordKing) {
 				isCheck = isCheck || checkKnightIsAttack(coordKing, color);
 			}
 			if (figuraType == PAWN && ((mathboard[(int)y][(int)x] & color) == 0)) {
-				isCheck = isCheck || checkPawnIsAttack(coordKing, color);
-				
+				isCheck = isCheck || checkPawnIsAttack(coordKing, color);				
 			}
 		}
 	}

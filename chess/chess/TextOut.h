@@ -24,7 +24,7 @@ private:
 	std::string stringBadMoveFigure = "Invalid move";
 	std::string stringBadMoveCheck = "Invalid move, you have check";
 	std::string stringCheck = "Check";
-	std::string stringCheckMate = "CheckMate";
+	std::string stringCheckMate = "CheckMate, press ESC and start new game";
 	std::string stringPat= "Draw";
 
 };
