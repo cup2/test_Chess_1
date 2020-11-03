@@ -269,6 +269,9 @@ int Chess::checkCheck(const int& color, sf::Vector2f coordKing) {
 				continue;
 			}
 			Vec attac = { x-coordKing.x,y-coordKing.y};
+			if (attac.x == 0 && attac.y == 0) {
+				continue;
+			}
 			if (((figuraType == ROOK) || (figuraType == QUIN)) && ((mathboard[(int)y][(int)x] & color) == 0)) {
 				for (auto it = moveRookQuin.begin(); it < moveRookQuin.end(); ++it) {
 					isCheck = isCheck || checkIsAtackKing(color, attac,*it, { x,y });

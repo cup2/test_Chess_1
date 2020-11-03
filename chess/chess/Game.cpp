@@ -92,7 +92,6 @@ int Game::execute(){
 	bool isMove = false;
 	float dx = 0, dy = 0; // old 
 	sf::Vector2f oldPos, newPos;
-	std::string str;
 	int selectedFigure = 0;
 	bool isMenu = true;
 	int menuNum = 0;
@@ -122,13 +121,15 @@ int Game::execute(){
 				if (sf::IntRect(150, 204, 300, 50).contains(sf::Mouse::getPosition(window))) {  menuNum = 3; }
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))                {
 					if (menuNum == 1) {
+						dx = 0, dy = 0;
+						selectedFigure = 0;
 						isWhiteMove = true;
 						loadPosition();
 						delete round;
 						round = new Chess();
-						isRun = true;
 						statusCode = 0;
 						isMenu = false;
+						isRun = true;
 					}
 					if (menuNum == 3) { window.close(); isMenu = false; }
 				}
